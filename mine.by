@@ -1,1 +1,27 @@
+import discord
+from discord.ext import commands
+import os
 
+blocked_words = ["كل خرا", "كس"]
+
+intents = discord.Intents.default()
+intents.message_content = True
+
+bot = commands.Bot(command_prefix="!", intents=intents)
+
+@bot.event
+async def on_ready():
+    print(f"Bot is online: {bot.user}")
+
+@bot.event
+async def on_message(message):
+    if message.author.bot:
+        return
+
+    if any(word in message.content for word in blocked_words):
+        await message.delete()
+        return
+
+    await bot.process_commands(message)
+
+bot.run(os.environ["DISCORD_TOKEN"])
